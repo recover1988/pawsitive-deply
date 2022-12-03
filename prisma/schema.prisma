@@ -1,0 +1,102 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String         @id @default(uuid())
+  firstName    String
+  lastName     String
+  email        String         @unique
+  age          Int
+  photo        String?
+  role         Role           @default(BASIC)
+  active       Boolean        @default(true)
+  password     String
+  adoptionPost AdoptionPost[]
+  businessPost BusinessPost[]
+  product      Product[]
+}
+
+enum Role {
+  BASIC
+  PROFESSIONAL
+  ADMIN
+}
+
+model AdoptionPost {
+  id          String   @id @default(uuid())
+  name        String?
+  size        Size
+  age         String
+  breed       String
+  photo       String?
+  active      Boolean
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  user        User?    @relation(fields: [userId], references: [id])
+  userId      String?
+}
+
+enum Size {
+  SMALL
+  MEDIUM
+  BIG
+  UNIQUE
+}
+
+model BusinessPost {
+  id              String  @id @default(uuid())
+  name            String
+  contact         String
+  address         String?
+  description     String
+  photo           String
+  type            Type
+  active          Boolean
+  ownerBusiness   User?   @relation(fields: [ownerBusinessId], references: [id])
+  ownerBusinessId String?
+}
+
+enum Type {
+  VETERINARY
+  SELLER
+  BARBER
+  KEEPER
+}
+
+model Product {
+  id           String   @id @default(uuid())
+  name         String
+  price        Float
+  displayPrice Float
+  description  String
+  stock        Int
+  photo        String
+  category     Category
+  brand        String?
+  size         Size?
+  active       Boolean
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  user         User?    @relation(fields: [userId], references: [id])
+  userId       String?
+}
+
+enum Category {
+  TOY
+  FOOD
+  SNACK
+  ACCESORIES
+  HYGIENE
+  HEALTH
+  OTHER
+}
